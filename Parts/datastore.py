@@ -231,10 +231,9 @@ class Tub(object):
                 json_data[key]=path
 
             elif typ == 'image_array':
-                img = Image.fromarray(np.uint8(val))
-		
-		# change jpg format to png to store the 4 channels image array
-                name = self.make_file_name(key, ext='.png')
+		# change image array from rpg-d to CMYK to store data in jpeg format
+		img = Image.fromarray(np.uint8(val), mode='CMYK')
+                name = self.make_file_name(key, ext='.jpg', format='JPEG')
                 img.save(os.path.join(self.path, name))
                 json_data[key]=name
 
