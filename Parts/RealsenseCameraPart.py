@@ -40,10 +40,13 @@ class RealsenseCameraPart(object):
         color_data = np.array(color.get_data())
 #run the below line if red and blue are flipped
 #        color_data = cv2.cvtColor(color_data, cv2.COLOR_BGR2RGB)
-        depth_data = np.array(depth.get_data())
+        depth_data = np.uint8(np.array(depth.get_data())//256)
         self.depth = cv2.resize(depth_data,(self.image_w,self.image_h))
         self.color = cv2.resize(color_data,(self.image_w,self.image_h))
-        self.combined_array = np.dstack((self.color, self.depth))
+        #3d image
+		self.combined_array = np.dstack((self.color[:,:,0], self.color[:,:,2], self.depth))
+		#4d image
+		#self.combined_array = np.dstack((self.color, self.depth))
         
     def update(self):
         while self.running:
