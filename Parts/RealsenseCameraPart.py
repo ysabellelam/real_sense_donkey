@@ -6,7 +6,7 @@ Created on Tue Nov  5 22:41:53 2019
 
 import cv2
 import time
-from pyrealsense2 import pipeline,colorizer,config,stream,format,hole_filling_filter,spatial_filter,temporal_filter
+from pyrealsense2 import pipeline,colorizer,config,stream,format,hole_filling_filter,spatial_filter,temporal_filter,option
 import numpy as np
 
 
@@ -32,9 +32,13 @@ class RealsenseCameraPart(object):
         self.pipe = pipeline()
         #load the configuration
         cfg = config()
-        cfg.enable_stream(stream.color,stream_index=-1,width=1280,height=720,framerate=30)
-        cfg.enable_stream(stream.depth, stream_index=-1,width=1280,height=720,framerate=30)
-        self.pipe.start(cfg)
+        cfg.enable_stream(stream.color,stream_index=-1,width=848,height=480,framerate=30)
+        cfg.enable_stream(stream.depth, stream_index=-1,width=848,height=480,framerate=30)
+        #start the pipeline
+        profile = self.pipe.start(cfg)
+        #set units to 100um
+        depth_sensor = profile.get_device().first_depth_sensor()
+        depth_sensor.set_option(option.depth_units,0.0001)
 
     def poll(self):
         frame_data = self.pipe.wait_for_frames()
@@ -52,13 +56,13 @@ class RealsenseCameraPart(object):
         
         if self.compress_depth:
           depth_data = np.uint8(np.array(depth.get_data())//256)
-          depth_data_compressed = np.dstack((depth_data[:240,:],depth_data[240:480,:],depth_data[480:720,:]))
-          self.combined_array = cv2.vconcat((color_data,depth_data_compressed))
+          depth_data_compressed = np.dstack((depth_data[:160,:],depth_data[160:320,:],depth_data[320:480,:]))
+          combined_raw = cv2.vconcat((color_data,depth_data_compressed))
         else:
           depth_data_c = colorizer.colorize(depth)
-          self.combined_array = cv2.vconcat((color_data,depth_data_c))
+          combined_raw = cv2.vconcat((color_data,depth_data_c))
         
-        self.combined_array = cv2.resize(self.combined_array,(self.image_w,self.image_h))
+        self.combined_array = cv2.resize(combined_raw,(self.image_w,self.image_h),interpolation=cv2.INTER_NEAREST)
         
         
     def update(self):
