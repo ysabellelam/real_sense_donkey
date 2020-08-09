@@ -2,7 +2,7 @@
 """
 Created on Sat Nov  9 19:32:47 2019
 
-@author: Jordan
+@author: Jordan, Ysabelle
 """
 from pyrealsense2 import context
 ctx = context()
