@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Nov  5 22:41:53 2019
-@author: Jordan
+@author: Jordan, William, Ysabelle
 """
 
 import cv2
